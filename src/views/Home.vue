@@ -29,6 +29,13 @@
     data: function () {
       return {
         message: "Welcome to Vue.js!",
+        places: [
+	        { lat: -25.363, lng: 131.044, description: "A place in Australia" },
+	        { lat: -33.8675, lng: 151.207, description: "The main city!" },
+	        { lat: 41.7658, lng: 72.6734, description: "The main city!" },
+	        // { lat: -115.1398, lng: 36.1699, description: "Las Vegas, NV!" },
+          // { lat: 144.7937, lng: 13.4443, description: "Guam, USA!" }
+	      ]
       };
     },
     mounted: function () {
@@ -43,7 +50,7 @@
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
         center: monument,
-        zoom: 9
+        zoom: 12
         });
 
         // create the popup
@@ -71,11 +78,18 @@
             container: 'map-2', // container ID
             style: 'mapbox://styles/mapbox/streets-v11', // style URL
             center: [12.550343, 55.665957], // starting position [lng, lat]
-            zoom: 9 // starting zoom
+            zoom: 1 // starting zoom
         });
-        const marker1 = new mapboxgl.Marker()
-          .setLngLat([12.554729, 55.70651])
-          .addTo(map);
+
+        for (var i = 0; i < this.places.length; i++) {
+          const marker1 = new mapboxgl.Marker()
+          .setLngLat(this.places[i])
+          .addTo(map);  
+        }
+
+        // const marker1 = new mapboxgl.Marker()
+        //   .setLngLat(this.places[1])
+        //   .addTo(map);
           
           // Create a default Marker, colored black, rotated 45 degrees.
           const marker2 = new mapboxgl.Marker({ color: 'black', rotation: 45 })
@@ -84,6 +98,14 @@
         // create the popup
         const popup = new mapboxgl.Popup({ offset: 25 }).setText(
         'Construction on the Washington Monument began in 1848.'
+        );
+
+        // Add the control to the map.
+        map.addControl(
+        new MapboxGeocoder({
+          accessToken: mapboxgl.accessToken,
+          mapboxgl: mapboxgl
+          })
         );
       }
     },
