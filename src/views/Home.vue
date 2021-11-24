@@ -1,13 +1,49 @@
 <template>
   <div class="home">
     <h1>{{ message }}</h1>
+    <div id='map-3' style='width: 400px; height: 300px;'></div>
+    <br>
     <div id='map' style='width: 400px; height: 300px;'></div>
     <br>
     <div id='map-2' style='width: 400px; height: 300px;'></div>
     <br>
-    <div id='map-3' style='width: 400px; height: 300px;'></div>
-    <br>
     <div id='map-4' style='width: 400px; height: 300px;'></div>
+    <br>
+    <div id="map"></div>
+    <div class="map-overlay top">
+      <div class="map-overlay-inner">
+        <fieldset>
+          <label>Select projection</label>
+          <select id="projection" name="projection">
+          <option value="albers">Albers</option>
+          <option value="equalEarth">Equal Earth</option>
+          <option value="equirectangular">Equirectangular</option>
+          <option value="lambertConformalConic" selected="">
+          Lambert Conformal Conic
+          </option>
+          <option value="mercator">Mercator</option>
+          <option value="naturalEarth">Natural Earth</option>
+          <option value="winkelTripel">Winkel Tripel</option>
+          </select>
+          </fieldset>
+          <fieldset class="conic-param-input">
+          <label>Center Longitude: <span id="lng-value">0</span></label>
+          <input id="lng" type="range" min="-180" max="180" step="any" value="0">
+          </fieldset>
+          <fieldset class="conic-param-input">
+          <label>Center Latitude: <span id="lat-value">30</span></label>
+          <input id="lat" type="range" min="-90" max="90" step="any" value="30">
+          </fieldset>
+          <fieldset class="conic-param-input">
+          <label>Southern Parallel Lat: <span id="lat1-value">30</span></label>
+          <input id="lat1" type="range" min="-90" max="90" step="any" value="30">
+          </fieldset>
+          <fieldset class="conic-param-input">
+          <label>Northern Parallel Lat: <span id="lat2-value">30</span></label>
+          <input id="lat2" type="range" min="-90" max="90" step="any" value="30">
+        </fieldset>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -47,6 +83,7 @@
       this.generateMap2();
       this.generateMap3();
       this.generateMap4();
+      this.generateMap5();
     },
     methods: {
       generateMap: function() {
@@ -246,6 +283,73 @@
         });
         });
       },
+      generateMap5: function() {
+        mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_KEY;
+        const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/satellite-streets-v11',
+        zoom: 0,
+        center: [0, 1],
+        projection: {
+        name: 'lambertConformalConic',
+        center: [0, 30],
+        parallels: [30, 30]
+        }
+        });
+        
+        const projectionInput = document.getElementById('projection');
+        const conicParamInputs =
+        document.getElementsByClassName('conic-param-input');
+        const lngInput = document.getElementById('lng');
+        const lngValue = document.getElementById('lng-value');
+        const latInput = document.getElementById('lat');
+        const latValue = document.getElementById('lat-value');
+        const lat1Input = document.getElementById('lat1');
+        const lat1Value = document.getElementById('lat1-value');
+        const lat2Input = document.getElementById('lat2');
+        const lat2Value = document.getElementById('lat2-value');
+        const inputs = [
+        [lngInput, lngValue],
+        [latInput, latValue],
+        [lat1Input, lat1Value],
+        [lat2Input, lat2Value]
+        ];
+        
+        projectionInput.addEventListener('change', (e) => {
+        const isConic = ['albers', 'lambertConformalConic'].includes(
+        e.target.value
+        );
+        
+        // Hide non-conic projection params
+        for (const input of conicParamInputs) {
+        input.style.display = isConic ? 'block' : 'none';
+        }
+        
+        map.setProjection(e.target.value);
+        
+        if (isConic) {
+        const { center, parallels } = map.getProjection();
+        lngInput.value = center[0];
+        latInput.value = center[1];
+        lat1Input.value = parallels[0];
+        lat2Input.value = parallels[1];
+        }
+        for (const [input, value] of inputs) {
+        value.textContent = input.value;
+        }
+        });
+        
+        for (const [input, value] of inputs) {
+        input.addEventListener('change', (e) => {
+        value.textContent = e.target.value;
+        map.setProjection({
+        name: projectionInput.value,
+        center: [Number(lngInput.value), Number(latInput.value)],
+        parallels: [Number(lat1Input.value), Number(lat2Input.value)]
+        });
+        });
+        }
+      }
     },
   };
 </script>
