@@ -9,7 +9,9 @@
     <br>
     <div id='map-4' style='width: 400px; height: 300px;'></div>
     <br>
-    <div id="map"></div>
+    <div id='map-5' style='width: 400px; height: 300px;'></div>
+    <br>
+    <div id="map-5"></div>
     <div class="map-overlay top">
       <div class="map-overlay-inner">
         <fieldset>
@@ -286,7 +288,7 @@
       generateMap5: function() {
         mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_KEY;
         const map = new mapboxgl.Map({
-        container: 'map',
+        container: 'map-5',
         style: 'mapbox://styles/mapbox/satellite-streets-v11',
         zoom: 0,
         center: [0, 1],
