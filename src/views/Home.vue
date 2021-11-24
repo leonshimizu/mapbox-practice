@@ -43,7 +43,7 @@
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v10',
         center: monument,
-        zoom: 15
+        zoom: 9
         });
 
         // create the popup
@@ -54,6 +54,10 @@
         // create DOM element for the marker
         const el = document.createElement('div');
         el.id = 'marker';
+
+        const marker1 = new mapboxgl.Marker()
+        .setLngLat([-77.036, 38.88])
+        .addTo(map);
         
         // create the marker
         new mapboxgl.Marker(el)
