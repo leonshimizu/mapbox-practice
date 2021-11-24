@@ -4,6 +4,8 @@
     <div id='map' style='width: 400px; height: 300px;'></div>
     <br>
     <div id='map-2' style='width: 400px; height: 300px;'></div>
+    <br>
+    <div id='map-3' style='width: 400px; height: 300px;'></div>
   </div>
 </template>
 
@@ -41,13 +43,14 @@
     mounted: function () {
       this.generateMap();
       this.generateMap2();
+      this.generateMap3()
     },
     methods: {
       generateMap: function() {
         mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_KEY;
         const monument = [-77.0353, 38.8895];
         const map = new mapboxgl.Map({
-        container: 'map',
+        container: 'map-3',
         style: 'mapbox://styles/mapbox/light-v10',
         center: monument,
         zoom: 12
@@ -107,6 +110,72 @@
           mapboxgl: mapboxgl
           })
         );
+      },
+      generateMap3: function() {
+        mapboxgl.accessToken = process.env.VUE_APP_MAPBOX_KEY;
+        const videoStyle = {
+        'version': 8,
+        'sources': {
+        'satellite': {
+        'type': 'raster',
+        'url': 'mapbox://mapbox.satellite',
+        'tileSize': 256
+        },
+        'video': {
+        'type': 'video',
+        'urls': [
+        'https://static-assets.mapbox.com/mapbox-gl-js/drone.mp4',
+        'https://static-assets.mapbox.com/mapbox-gl-js/drone.webm'
+        ],
+        'coordinates': [
+        [-122.51596391201019, 37.56238816766053],
+        [-122.51467645168304, 37.56410183312965],
+        [-122.51309394836426, 37.563391708549425],
+        [-122.51423120498657, 37.56161849366671]
+        ]
+        }
+        },
+        'layers': [
+        {
+        'id': 'background',
+        'type': 'background',
+        'paint': {
+        'background-color': 'rgb(4,7,14)'
+        }
+        },
+        {
+        'id': 'satellite',
+        'type': 'raster',
+        'source': 'satellite'
+        },
+        {
+        'id': 'video',
+        'type': 'raster',
+        'source': 'video'
+        }
+        ]
+        };
+        
+        const map = new mapboxgl.Map({
+        container: 'map',
+        minZoom: 14,
+        zoom: 17,
+        center: [-122.514426, 37.562984],
+        bearing: -96,
+        style: videoStyle
+        });
+        
+        let playingVideo = true;
+        
+        map.on('click', () => {
+        playingVideo = !playingVideo;
+        
+        if (playingVideo) {
+        map.getSource('video').play();
+        } else {
+        map.getSource('video').pause();
+        }
+        });
       }
     },
   };
